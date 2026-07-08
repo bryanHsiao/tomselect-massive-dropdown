@@ -46,8 +46,7 @@
     -webkit-font-smoothing:antialiased;
     background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
     background-size:44px 44px;}
-  .wrap{max-width:760px;margin:0 auto;padding:16px 22px 18px}
-  @media(max-width:640px){.wrap{padding-top:58px}}
+  .wrap{max-width:760px;margin:0 auto;padding:14px 22px 16px}
 
   /* 標題（左對齊，反置中偏見） */
   .kicker{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.16em;
@@ -70,7 +69,7 @@
   .leg span{font-family:var(--mono);font-size:10px;color:var(--muted)}
 
   /* 舞台 */
-  .stage{position:relative;height:var(--h,238px);border:1px solid var(--line);border-radius:16px;
+  .stage{position:relative;height:var(--h,224px);border:1px solid var(--line);border-radius:16px;
     background:var(--panel);box-shadow:var(--shadow);overflow:hidden;cursor:pointer}
   .stage::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 0%,var(--sunk),transparent 70%);pointer-events:none}
   @media(max-width:600px){.stage{--h:250px}}
@@ -161,13 +160,13 @@
   .tip{font-family:var(--mono);font-size:11.5px;color:var(--faint)}
   .count{font-family:var(--mono);font-size:12px;color:var(--faint)}
 
-  .navL{position:fixed;top:14px;left:14px;display:flex;gap:8px;z-index:10}
-  .navR{position:fixed;top:14px;right:14px;display:flex;gap:8px;z-index:10}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .grp{display:flex;gap:8px}
   .pill{font-family:var(--mono);font-size:11.5px;font-weight:700;border:1px solid var(--line);
-    background:var(--panel);color:var(--muted);border-radius:10px;padding:7px 11px;cursor:pointer;
+    background:var(--panel);color:var(--muted);border-radius:10px;padding:6px 11px;cursor:pointer;
     box-shadow:var(--shadow);text-decoration:none;white-space:nowrap}
   .pill:hover{color:var(--accent);border-color:var(--accent)}
-  @media(max-width:640px){.pill.opt{display:none}}
+  @media(max-width:520px){.pill.opt{display:none}}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
   @media (prefers-reduced-motion:reduce){
@@ -178,15 +177,17 @@
 </style>
 </head>
 <body>
-<div class="navL">
-  <a class="pill" href="./index.html">← 說明頁</a>
-  <a class="pill" href="./tomselect-demo.html">互動 Demo →</a>
-</div>
-<div class="navR">
-  <a class="pill opt" href="https://github.com/bryanHsiao/tomselect-massive-dropdown" target="_blank" rel="noopener">GitHub ↗</a>
-  <button class="pill" id="themeBtn" type="button">主題</button>
-</div>
 <div class="wrap">
+  <div class="topbar">
+    <div class="grp">
+      <a class="pill" href="./index.html">← 說明頁</a>
+      <a class="pill" href="./tomselect-demo.html">互動 Demo →</a>
+    </div>
+    <div class="grp">
+      <a class="pill opt" href="https://github.com/bryanHsiao/tomselect-massive-dropdown" target="_blank" rel="noopener">GitHub ↗</a>
+      <button class="pill" id="themeBtn" type="button">主題</button>
+    </div>
+  </div>
   <p class="kicker">Domino 機關代碼下拉 · 前端全量架構</p>
   <h1>巨量下拉，<b>三階段</b>載入</h1>
   <p class="lede">為什麼一次載全量還能不卡、不白畫面？把載入拆成三步看：先出畫面、背景抓全量、灌入即可本地搜尋。</p>
