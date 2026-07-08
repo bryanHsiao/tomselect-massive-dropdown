@@ -4,9 +4,11 @@
 
 ## 線上展示（GitHub Pages）
 
-- **首頁**：`index.html`
-- **三階段載入動畫**：`loading-stages-demo.html` — 逐步拆解「先出畫面 → 背景抓全量 → 灌入可搜」，零依賴、純 CSS 動畫。
-- **六萬筆互動 Demo**：`tomselect-demo.html` — 前端即時生成 60,000 筆合成資料，全量灌進 Tom Select，實際感受虛擬化搜尋（可多選）。
+**➜ https://bryanhsiao.github.io/tomselect-massive-dropdown/**
+
+- **首頁**：<https://bryanhsiao.github.io/tomselect-massive-dropdown/>
+- **三階段載入動畫**：<https://bryanhsiao.github.io/tomselect-massive-dropdown/loading-stages-demo.html> — 逐步拆解「先出畫面 → 背景抓全量 → 灌入可搜」，零依賴、純 CSS 動畫。
+- **六萬筆互動 Demo**：<https://bryanhsiao.github.io/tomselect-massive-dropdown/tomselect-demo.html> — 前端即時生成 60,000 筆合成資料，全量灌進 Tom Select，實際感受虛擬化搜尋（可多選）。
 
 ## 結論
 
