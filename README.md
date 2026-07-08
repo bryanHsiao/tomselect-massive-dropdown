@@ -25,7 +25,9 @@
 
 ## 正式環境
 
-展示頁直接 `fetch` 本 repo 內的 `agencies-active.txt`（模擬正式環境的全量端點）。正式環境資料由 Domino XAgent 全量端點供應（Extension Library `<xe:restService>`，伺服器端 `applicationScope` 快取；第一次建置約 8 秒、之後約 0.4 秒）。後端實作與內網位址不在本 repo。
+展示頁直接 `fetch` 本 repo 內的 `agencies-active.txt`（模擬正式環境的全量端點）。正式環境資料由 Domino XAgent 全量端點供應（Extension Library `<xe:restService>`）。
+
+**快取策略**：主線走「三階段背景載入 ＋ 前端 `localStorage` 快取」——同一瀏覽器第二次起免重抓、秒開。伺服器端 `applicationScope` 共用快取（第一次建置約 8 秒、之後約 0.4 秒，全 app 共用一份）則留給「同時多人、在意伺服器負載」時再加。後端實作與內網位址不在本 repo。
 
 ## 資料來源
 

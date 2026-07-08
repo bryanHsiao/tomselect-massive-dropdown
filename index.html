@@ -99,7 +99,7 @@
   </table>
 
   <footer>
-    合成資料的效能實驗；正式環境資料由 Domino XAgent 全量端點供應（伺服器端 applicationScope 快取）。
+    合成資料的效能實驗；正式環境資料由 Domino XAgent 全量端點供應，走三階段背景載入 ＋ 前端 localStorage 快取（applicationScope 共用快取留給多人高負載時）。
     元件：<span class="mono">Tom Select 2.3</span>。
   </footer>
 </div>

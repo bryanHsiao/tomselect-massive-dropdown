@@ -227,7 +227,7 @@
     <!-- 伺服器 -->
     <div class="node server" id="server" data-active="0-3">
       <div class="rack"><div class="u"></div><div class="u"></div><div class="u"></div>
-        <div class="badge"><span>applicationScope 快取</span></div>
+        <div class="badge"><span>全量 · 快取</span></div>
       </div>
       <p class="cap">Domino 伺服器<small>xspServiceLookup.xsp</small></p>
     </div>
@@ -264,7 +264,7 @@
     '使用者開啟頁面，瀏覽器向 Domino 要 <span class="k">HTML</span>。',
     '<span class="k">defer</span> 讓 JS 不擋 render；HTML 一到，畫面框架與下拉空殼<b>立刻出現</b>（顯示「資料載入中」）。不再白畫面。',
     '畫面已可見。前端在背景發出 <span class="k">fetch ?mode=all</span>，向 Domino 要全部資料。',
-    'Domino 從 <span class="k">applicationScope 快取</span>回傳全量（近 4 萬筆）約 0.4 秒（冷啟動才 8 秒）。',
+    'Domino 回傳全量（近 4 萬筆）：有<span class="k">快取</span>約 0.4 秒、冷啟動才 8 秒。前端可再存 localStorage，第二次秒開。',
     '近 4 萬筆灌進 Tom Select。<span class="k">虛擬化</span>下任何時刻最多只渲染 50 筆，init 約 50ms。',
     '打「108」後，名稱、代碼、中間關鍵字全<b>純前端過濾</b>，瞬間出結果，<b>不再打伺服器</b>。'
   ];

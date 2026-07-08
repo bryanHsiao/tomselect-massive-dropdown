@@ -92,7 +92,9 @@
   <div class="note">
     <b>資料來源</b>：政府開放資料「地址簿公開資訊」現行有效機關（<a href="https://www.good.nat.gov.tw/regcenter/download" target="_blank" rel="noopener">good.nat.gov.tw</a>）。
     本頁直接 <span class="mono">fetch</span> 這份 TSV 再前端解析，模擬正式環境向 Domino XAgent 全量端點
-    （<span class="mono">xspServiceLookup.xsp/lookup?mode=all</span> · 伺服器端 applicationScope 快取）取資料的流程。
+    （<span class="mono">xspServiceLookup.xsp/lookup?mode=all</span>）取資料的流程。
+    正式環境主線用<b>三階段背景載入 ＋ 前端 localStorage 快取</b>（同一瀏覽器第二次起免重抓、秒開）；
+    伺服器端 <span class="mono">applicationScope</span> 共用快取則留給「同時多人、在意伺服器負載」時再加。
     載入原理請看 <a href="./loading-stages-demo.html">三階段載入動畫</a>。
   </div>
 </div>
