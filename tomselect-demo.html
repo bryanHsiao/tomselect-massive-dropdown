@@ -58,8 +58,8 @@
 <button class="theme" id="themeBtn" type="button">主題</button>
 <div class="wrap">
   <p class="kicker">Domino 機關代碼下拉 · 互動 Demo</p>
-  <h1>四萬筆下拉，前端搜到底</h1>
-  <p class="lede">本頁在瀏覽器端即時生成 <b>40,000 筆</b>合成機關資料，全量灌進 Tom Select。搜尋純前端執行：名稱、代碼、中間關鍵字都命中；虛擬化讓任何時刻最多只渲染 50 筆。</p>
+  <h1>巨量下拉，前端搜到底</h1>
+  <p class="lede">本頁在瀏覽器端即時生成 <b>60,000 筆</b>合成機關資料（貼近實際 6～8 萬筆規模），全量灌進 Tom Select。搜尋純前端執行：名稱、代碼、中間關鍵字都命中；虛擬化讓任何時刻最多只渲染 50 筆。</p>
 
   <label for="picker">機關代碼（多選）</label>
   <select id="picker" placeholder="輸入機關名稱或代碼關鍵字…"></select>
@@ -84,7 +84,7 @@
 <script>
 const $=id=>document.getElementById(id), ms=n=>n.toFixed(0)+' ms';
 
-// 前端合成約 4 萬筆機關資料（無後端、無內網位址）
+// 前端合成 6 萬筆機關資料（無後端、無內網位址）
 function generate(n){
   const city=['臺北市','新北市','桃園市','臺中市','臺南市','高雄市','基隆市','新竹市','宜蘭縣','花蓮縣','臺東縣','屏東縣','雲林縣','嘉義縣','南投縣','彰化縣'];
   const org=['政府','區公所','戶政事務所','地政事務所','稅捐稽徵處','衛生所','國民小學','國民中學','高級中學','醫院','圖書館','文化中心','消防局','警察局','建設公司','企業社','股份有限公司','實業有限公司','科技股份有限公司','農會'];
@@ -115,7 +115,7 @@ function boot(){
 
   // 生成
   const t0=performance.now();
-  const all=generate(40000);
+  const all=generate(60000);
   const t1=performance.now();
   $('s-gen').textContent=ms(t1-t0);
   $('s-count').textContent=all.length.toLocaleString()+' 筆';
@@ -130,7 +130,7 @@ function boot(){
   else ts.control_input.setAttribute('placeholder', ts.settings.placeholder);
   $('s-init').textContent=ms(t3-t2);
   $('s-total').textContent=ms(t3-t0);
-  const st=$('status'); st.className='ok'; st.textContent='✓ 就緒：40,000 筆已在前端，搜尋純瀏覽器端執行。';
+  const st=$('status'); st.className='ok'; st.textContent='✓ 就緒：60,000 筆已在前端，搜尋純瀏覽器端執行。';
 
   window.preselect=codes=>ts.setValue(codes,true);
   ts.on('change',()=>console.log('已選：', ts.getValue()));
