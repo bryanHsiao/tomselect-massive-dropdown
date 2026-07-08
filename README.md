@@ -1,6 +1,6 @@
 # 四萬筆下拉選單 · 前端全量效能實驗
 
-機關代碼表達 6～8 萬筆的下拉選單，要讓使用者打字即搜（機關名稱、機關代碼、中間關鍵字都要命中）。這個 repo 記錄實測與可互動的展示頁。
+近 4 萬筆真實政府機關的下拉選單，要讓使用者打字即搜（機關名稱、機關代碼、中間關鍵字都要命中）。這個 repo 記錄實測與可互動的展示頁。
 
 ## 線上展示（GitHub Pages）
 
@@ -8,7 +8,7 @@
 
 - **首頁**：<https://bryanhsiao.github.io/tomselect-massive-dropdown/>
 - **三階段載入動畫**：<https://bryanhsiao.github.io/tomselect-massive-dropdown/loading-stages-demo.html> — 逐步拆解「先出畫面 → 背景抓全量 → 灌入可搜」，零依賴、純 CSS 動畫。
-- **六萬筆互動 Demo**：<https://bryanhsiao.github.io/tomselect-massive-dropdown/tomselect-demo.html> — 前端即時生成 60,000 筆合成資料，全量灌進 Tom Select，實際感受虛擬化搜尋（可多選）。
+- **真實資料互動 Demo**：<https://bryanhsiao.github.io/tomselect-massive-dropdown/tomselect-demo.html> — 直接 `fetch` 近 4 萬筆真實政府開放資料再前端解析，全量灌進 Tom Select，實際感受虛擬化搜尋（可多選）。
 
 ## 結論
 
@@ -25,7 +25,12 @@
 
 ## 正式環境
 
-展示頁的資料為前端合成、無後端。正式環境資料由 Domino XAgent 全量端點供應（Extension Library `<xe:restService>`，伺服器端 `applicationScope` 快取；第一次建置約 8 秒、之後約 0.4 秒）。後端實作與內網位址不在本 repo。
+展示頁直接 `fetch` 本 repo 內的 `agencies-active.txt`（模擬正式環境的全量端點）。正式環境資料由 Domino XAgent 全量端點供應（Extension Library `<xe:restService>`，伺服器端 `applicationScope` 快取；第一次建置約 8 秒、之後約 0.4 秒）。後端實作與內網位址不在本 repo。
+
+## 資料來源
+
+`agencies-active.txt`：政府開放資料「地址簿公開資訊」現行有效機關，39,553 筆，格式為每行「機關代碼＜TAB＞機關名稱」。
+來源：<https://www.good.nat.gov.tw/regcenter/download>
 
 ## 技術
 

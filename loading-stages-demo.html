@@ -207,7 +207,7 @@
           <div class="st" data-show="1-3"><div class="field"><span class="spin"></span>資料載入中</div></div>
           <div class="st" data-show="4">
             <div class="field live"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>輸入名稱或代碼</div>
-            <div class="rows"><div class="r">60,000 筆已載入 · 渲染上限 50</div></div>
+            <div class="rows"><div class="r">39,553 筆已載入 · 渲染上限 50</div></div>
           </div>
           <div class="st" data-show="5">
             <div class="field live"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>108<span class="caret"></span></div>
@@ -233,7 +233,7 @@
     <div class="pkt req" data-step="0" data-fx="30" data-fy="50" data-tx="72" data-ty="50">GET / · HTML</div>
     <div class="pkt res" data-step="1" data-fx="72" data-fy="50" data-tx="30" data-ty="50">HTML · CSS · JS</div>
     <div class="pkt req" data-step="2" data-fx="30" data-fy="50" data-tx="72" data-ty="50">GET ?mode=all</div>
-    <div class="pkt res big" data-step="3" data-fx="72" data-fy="50" data-tx="30" data-ty="50">六萬筆 · 全量 JSON</div>
+    <div class="pkt res big" data-step="3" data-fx="72" data-fy="50" data-tx="30" data-ty="50">近 4 萬筆 · 全量 JSON</div>
   </div>
 
   <p class="cap-line" id="caption"></p>
@@ -256,8 +256,8 @@
     '使用者開啟頁面，瀏覽器向 Domino 要 <span class="k">HTML</span>。',
     '<span class="k">defer</span> 讓 JS 不擋 render；HTML 一到，畫面框架與下拉空殼<b>立刻出現</b>（顯示「資料載入中」）。不再白畫面。',
     '畫面已可見。前端在背景發出 <span class="k">fetch ?mode=all</span>，向 Domino 要全部資料。',
-    'Domino 從 <span class="k">applicationScope 快取</span>回傳全量（六萬筆）約 0.4 秒（冷啟動才 8 秒）。',
-    '六萬筆灌進 Tom Select。<span class="k">虛擬化</span>下任何時刻最多只渲染 50 筆，init 約 50ms。',
+    'Domino 從 <span class="k">applicationScope 快取</span>回傳全量（近 4 萬筆）約 0.4 秒（冷啟動才 8 秒）。',
+    '近 4 萬筆灌進 Tom Select。<span class="k">虛擬化</span>下任何時刻最多只渲染 50 筆，init 約 50ms。',
     '打「108」後，名稱、代碼、中間關鍵字全<b>純前端過濾</b>，瞬間出結果，<b>不再打伺服器</b>。'
   ];
   const q=s=>document.querySelector(s), qa=s=>document.querySelectorAll(s);
