@@ -46,33 +46,34 @@
     -webkit-font-smoothing:antialiased;
     background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
     background-size:44px 44px;}
-  .wrap{max-width:760px;margin:0 auto;padding:30px 22px 34px}
+  .wrap{max-width:760px;margin:0 auto;padding:16px 22px 18px}
+  @media(max-width:640px){.wrap{padding-top:58px}}
 
   /* 標題（左對齊，反置中偏見） */
   .kicker{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.16em;
-    text-transform:uppercase;color:var(--accent);margin:0 0 9px;display:flex;align-items:center;gap:9px}
+    text-transform:uppercase;color:var(--accent);margin:0 0 6px;display:flex;align-items:center;gap:9px}
   .kicker::before{content:"";width:22px;height:1px;background:var(--accent)}
-  h1{font-family:var(--cjk);font-weight:800;font-size:clamp(25px,4.6vw,38px);line-height:1.1;
-    letter-spacing:-.01em;margin:0 0 9px}
+  h1{font-family:var(--cjk);font-weight:800;font-size:clamp(22px,3.6vw,32px);line-height:1.08;
+    letter-spacing:-.01em;margin:0 0 6px}
   h1 b{color:var(--accent);font-weight:800}
-  .lede{color:var(--muted);font-size:14.5px;max-width:52ch;margin:0 0 18px}
+  .lede{color:var(--muted);font-size:13.5px;max-width:52ch;margin:0 0 13px}
 
   /* 三階段圖例（動作為主，序號為輔） */
-  .legend{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 16px}
+  .legend{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:0 0 12px}
   @media(max-width:600px){.legend{grid-template-columns:1fr;gap:7px}}
-  .leg{padding:10px 13px;border:1px solid var(--line);border-radius:12px;background:var(--panel);
+  .leg{padding:8px 12px;border:1px solid var(--line);border-radius:11px;background:var(--panel);
     opacity:.45;transition:opacity .4s,border-color .4s,box-shadow .4s}
   .leg.on{opacity:1;border-color:var(--accent);box-shadow:var(--shadow)}
   .leg .n{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--faint);letter-spacing:.05em}
   .leg.on .n{color:var(--accent)}
-  .leg b{display:block;font-size:14px;margin:2px 0 0}
-  .leg span{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+  .leg b{display:block;font-size:13.5px;margin:1px 0 0}
+  .leg span{font-family:var(--mono);font-size:10px;color:var(--muted)}
 
   /* 舞台 */
-  .stage{position:relative;height:var(--h,284px);border:1px solid var(--line);border-radius:18px;
+  .stage{position:relative;height:var(--h,238px);border:1px solid var(--line);border-radius:16px;
     background:var(--panel);box-shadow:var(--shadow);overflow:hidden}
   .stage::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 0%,var(--sunk),transparent 70%);pointer-events:none}
-  @media(max-width:600px){.stage{--h:270px}}
+  @media(max-width:600px){.stage{--h:250px}}
 
   .link{position:absolute;left:33%;top:50%;width:34%;height:2px;transform:translateY(-50%);
     background:repeating-linear-gradient(90deg,var(--line2) 0 6px,transparent 6px 13px);transition:opacity .4s}
@@ -93,7 +94,7 @@
   .browser.hot .frame{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
   .chrome{display:flex;gap:5px;padding:8px 11px;background:var(--panel);border-bottom:1px solid var(--line)}
   .chrome i{width:8px;height:8px;border-radius:50%;background:var(--line2)}
-  .screen{position:relative;height:80px;padding:12px}
+  .screen{position:relative;height:72px;padding:11px}
   .st{position:absolute;inset:12px;opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s;pointer-events:none}
   .st.on{opacity:1;transform:none}
   .field{border:1px solid var(--line2);border-radius:8px;padding:7px 9px;font-size:11px;
@@ -138,12 +139,12 @@
   }
 
   /* 說明 + 控制 */
-  .cap-line{min-height:46px;margin:15px 2px 4px;font-size:14px;color:var(--ink)}
+  .cap-line{min-height:38px;margin:11px 2px 2px;font-size:13.5px;color:var(--ink)}
   .cap-line .k{font-family:var(--mono);font-size:12.5px;color:var(--accent-ink);background:var(--accent-soft);
     padding:1px 7px;border-radius:6px;font-weight:700}
   .cap-line b{color:var(--accent);font-weight:700}
-  .controls{display:flex;align-items:center;gap:16px;margin-top:12px}
-  .nav{width:40px;height:40px;border-radius:11px;border:1px solid var(--line2);background:var(--panel);color:var(--ink);
+  .controls{display:flex;align-items:center;gap:16px;margin-top:10px}
+  .nav{width:38px;height:38px;border-radius:11px;border:1px solid var(--line2);background:var(--panel);color:var(--ink);
     display:grid;place-items:center;cursor:pointer;transition:.18s;flex:none}
   .nav:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
   .nav:active{transform:translateY(0)}
@@ -151,20 +152,20 @@
   .dots{display:flex;gap:8px;flex:1;justify-content:center}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--dot);border:none;cursor:pointer;padding:0;transition:.25s}
   .dot.on{background:var(--accent);width:24px;border-radius:4px}
-  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:11px}
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:9px}
   .toggle{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--muted);background:none;border:none;
     cursor:pointer;display:flex;align-items:center;gap:7px;padding:6px 2px}
   .toggle:hover{color:var(--accent)}
   .toggle svg{width:13px;height:13px;fill:currentColor}
   .count{font-family:var(--mono);font-size:12px;color:var(--faint)}
 
-  .theme{position:fixed;top:16px;font-family:var(--mono);font-size:11.5px;font-weight:700;z-index:10;
-    border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:10px;padding:7px 12px;cursor:pointer;box-shadow:var(--shadow);text-decoration:none}
-  .theme:hover{color:var(--accent);border-color:var(--accent)}
-  .theme.back{left:16px;right:auto}
-  .theme.gh{right:82px}
-  .theme.tog{right:16px}
-  @media(max-width:560px){.theme.gh{display:none}}
+  .navL{position:fixed;top:14px;left:14px;display:flex;gap:8px;z-index:10}
+  .navR{position:fixed;top:14px;right:14px;display:flex;gap:8px;z-index:10}
+  .pill{font-family:var(--mono);font-size:11.5px;font-weight:700;border:1px solid var(--line);
+    background:var(--panel);color:var(--muted);border-radius:10px;padding:7px 11px;cursor:pointer;
+    box-shadow:var(--shadow);text-decoration:none;white-space:nowrap}
+  .pill:hover{color:var(--accent);border-color:var(--accent)}
+  @media(max-width:640px){.pill.opt{display:none}}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
   @media (prefers-reduced-motion:reduce){
@@ -175,9 +176,14 @@
 </style>
 </head>
 <body>
-<a class="theme back" href="./index.html">← 說明頁</a>
-<a class="theme gh" href="https://github.com/bryanHsiao/tomselect-massive-dropdown" target="_blank" rel="noopener">GitHub ↗</a>
-<button class="theme tog" id="themeBtn" type="button">主題</button>
+<div class="navL">
+  <a class="pill" href="./index.html">← 說明頁</a>
+  <a class="pill" href="./tomselect-demo.html">互動 Demo →</a>
+</div>
+<div class="navR">
+  <a class="pill opt" href="https://github.com/bryanHsiao/tomselect-massive-dropdown" target="_blank" rel="noopener">GitHub ↗</a>
+  <button class="pill" id="themeBtn" type="button">主題</button>
+</div>
 <div class="wrap">
   <p class="kicker">Domino 機關代碼下拉 · 前端全量架構</p>
   <h1>巨量下拉，<b>三階段</b>載入</h1>
