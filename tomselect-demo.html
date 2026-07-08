@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>四萬筆下拉 · Tom Select 虛擬化互動 Demo</title>
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root[data-theme="light"], :root:not([data-theme="dark"]){
+    --bg:#f7f7f8;--panel:#fff;--ink:#18181b;--muted:#52525b;--faint:#a1a1aa;
+    --line:#e6e6e9;--line2:#d6d6da;--accent:#047857;--accent-soft:#e2f5ec;--grid:rgba(24,24,27,.045);
+  }
+  @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#0b0c0e;--panel:#161719;--ink:#ececee;--muted:#9d9da4;--faint:#66666e;
+    --line:#26272b;--line2:#33343a;--accent:#34d399;--accent-soft:rgba(16,185,129,.14);--grid:rgba(255,255,255,.04);
+  }}
+  :root[data-theme="dark"]{
+    --bg:#0b0c0e;--panel:#161719;--ink:#ececee;--muted:#9d9da4;--faint:#66666e;
+    --line:#26272b;--line2:#33343a;--accent:#34d399;--accent-soft:rgba(16,185,129,.14);--grid:rgba(255,255,255,.04);
+  }
+  *{box-sizing:border-box}
+  html{color-scheme:light dark}
+  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",-apple-system,"Segoe UI",system-ui,sans-serif;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:44px 44px;}
+  .wrap{max-width:620px;margin:0 auto;padding:40px 22px 64px}
+  .mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+  .kicker{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 10px;display:flex;align-items:center;gap:9px}
+  .kicker::before{content:"";width:22px;height:1px;background:var(--accent)}
+  h1{font-weight:800;font-size:clamp(24px,4.5vw,34px);line-height:1.14;letter-spacing:-.01em;margin:0 0 10px}
+  .lede{color:var(--muted);font-size:14.5px;margin:0 0 24px;max-width:54ch}
+  label{display:block;font-weight:600;font-size:13px;margin:0 0 7px}
+  .hint{color:var(--faint);font-size:12px;margin-top:7px}
+  #status{font-size:13px;margin:12px 0;color:var(--muted)}
+  #status.ok{color:var(--accent)}
+  table{margin-top:22px;border-collapse:collapse;width:100%;font-size:12.5px}
+  th,td{border:1px solid var(--line);padding:7px 11px;text-align:left}
+  th{background:var(--panel);color:var(--muted);font-weight:600;width:42%}
+  td{font-family:"JetBrains Mono",monospace;color:var(--ink)}
+  .theme{position:fixed;top:16px;right:16px;font-family:"JetBrains Mono",monospace;font-size:11.5px;font-weight:700;
+    border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:10px;padding:7px 12px;cursor:pointer}
+  .theme:hover{color:var(--accent);border-color:var(--accent)}
+  .note{margin-top:26px;padding:12px 14px;border:1px dashed var(--line2);border-radius:11px;
+    font-size:12.5px;color:var(--muted)}
+  .note b{color:var(--ink)}
+  a{color:var(--accent)}
+  /* Tom Select 多選：一行一個 */
+  .ts-wrapper.multi .ts-control>.item{display:flex;align-items:center;justify-content:space-between;
+    width:100%;box-sizing:border-box;margin:3px 0;padding:5px 9px;border-radius:7px}
+  .ts-wrapper.multi .ts-control>.item .remove{border-left:1px solid rgba(128,128,128,.3);margin-left:8px;padding-left:8px}
+</style>
+</head>
+<body>
+<button class="theme" id="themeBtn" type="button">主題</button>
+<div class="wrap">
+  <p class="kicker">Domino 機關代碼下拉 · 互動 Demo</p>
+  <h1>四萬筆下拉，前端搜到底</h1>
+  <p class="lede">本頁在瀏覽器端即時生成 <b>40,000 筆</b>合成機關資料，全量灌進 Tom Select。搜尋純前端執行：名稱、代碼、中間關鍵字都命中；虛擬化讓任何時刻最多只渲染 50 筆。</p>
+
+  <label for="picker">機關代碼（多選）</label>
+  <select id="picker" placeholder="輸入機關名稱或代碼關鍵字…"></select>
+  <p class="hint">顯示 = 機關名稱、存的 value = 機關代碼。可複選，每筆一行、附移除鈕。</p>
+
+  <div id="status">初始化中…</div>
+
+  <table>
+    <tr><th>生成資料</th><td id="s-gen">—</td></tr>
+    <tr><th>載入筆數</th><td id="s-count">—</td></tr>
+    <tr><th>Tom Select 初始化</th><td id="s-init">—</td></tr>
+    <tr><th>合計（可用前）</th><td id="s-total">—</td></tr>
+  </table>
+
+  <div class="note">
+    <b>這是公開展示版</b>，資料為前端合成、無後端。正式環境改由 Domino XAgent 全量端點
+    （<span class="mono">xspServiceLookup.xsp/lookup?mode=all</span>，伺服器端 applicationScope 快取）供資料。
+    載入流程請看 <a href="./loading-stages-demo.html">三階段載入動畫</a>。
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id), ms=n=>n.toFixed(0)+' ms';
+
+// 前端合成約 4 萬筆機關資料（無後端、無內網位址）
+function generate(n){
+  const city=['臺北市','新北市','桃園市','臺中市','臺南市','高雄市','基隆市','新竹市','宜蘭縣','花蓮縣','臺東縣','屏東縣','雲林縣','嘉義縣','南投縣','彰化縣'];
+  const org=['政府','區公所','戶政事務所','地政事務所','稅捐稽徵處','衛生所','國民小學','國民中學','高級中學','醫院','圖書館','文化中心','消防局','警察局','建設公司','企業社','股份有限公司','實業有限公司','科技股份有限公司','農會'];
+  const out=new Array(n);
+  for(let i=0;i<n;i++){
+    const c=city[i%city.length], o=org[(i*13)%org.length];
+    const serial=String((i%9000)+1).padStart(4,'0');
+    out[i]={
+      id:'A'+String(100000+i)+String.fromCharCode(85+(i%3))+serial.slice(0,2),
+      text:c+'第'+serial+o
+    };
+  }
+  return out;
+}
+
+function boot(){
+  // 先建空殼（畫面先出，不白）
+  const ts=new TomSelect('#picker',{
+    valueField:'id', labelField:'text', searchField:['text','id'],
+    maxOptions:50, maxItems:null, plugins:['remove_button'],
+    placeholder:'資料生成中…請稍候',
+    render:{
+      option:(d,esc)=>'<div><span style="color:var(--faint);font-family:monospace">'+esc(d.id)+'</span>　'+esc(d.text)+'</div>',
+      no_results:()=>'<div class="no-results">查無符合的機關</div>'
+    }
+  });
+  ts.disable();
+
+  // 生成
+  const t0=performance.now();
+  const all=generate(40000);
+  const t1=performance.now();
+  $('s-gen').textContent=ms(t1-t0);
+  $('s-count').textContent=all.length.toLocaleString()+' 筆';
+
+  // 灌入
+  const t2=performance.now();
+  ts.addOptions(all);
+  const t3=performance.now();
+  ts.enable();
+  ts.settings.placeholder='輸入機關名稱或代碼關鍵字…';
+  if(typeof ts.updatePlaceholder==='function') ts.updatePlaceholder();
+  else ts.control_input.setAttribute('placeholder', ts.settings.placeholder);
+  $('s-init').textContent=ms(t3-t2);
+  $('s-total').textContent=ms(t3-t0);
+  const st=$('status'); st.className='ok'; st.textContent='✓ 就緒：40,000 筆已在前端，搜尋純瀏覽器端執行。';
+
+  window.preselect=codes=>ts.setValue(codes,true);
+  ts.on('change',()=>console.log('已選：', ts.getValue()));
+}
+
+$('#themeBtn').onclick=()=>{
+  const r=document.documentElement, cur=r.getAttribute('data-theme');
+  const sysDark=matchMedia('(prefers-color-scheme:dark)').matches;
+  const now=(cur==='auto'||!cur)?(sysDark?'dark':'light'):cur;
+  r.setAttribute('data-theme', now==='dark'?'light':'dark');
+};
+
+window.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>

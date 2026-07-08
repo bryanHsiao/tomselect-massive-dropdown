@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>四萬筆下拉，三階段載入</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* ── 開發者工具 / dark-tech：冷 zinc 中性 + 單一 emerald 強調 ── */
+  :root[data-theme="light"], :root:not([data-theme="dark"]){
+    --bg:#f7f7f8; --panel:#ffffff; --sunk:#fbfbfc;
+    --ink:#18181b; --muted:#52525b; --faint:#a1a1aa;
+    --line:#e6e6e9; --line2:#d6d6da;
+    --accent:#047857; --accent-2:#059669; --accent-ink:#065f46; --accent-soft:#e2f5ec;
+    --dot:#c9c9cf; --grid:rgba(24,24,27,.045);
+    --shadow:0 1px 2px rgba(20,25,30,.05), 0 14px 34px -22px rgba(20,25,30,.4);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0b0c0e; --panel:#161719; --sunk:#101113;
+      --ink:#ececee; --muted:#9d9da4; --faint:#66666e;
+      --line:#26272b; --line2:#33343a;
+      --accent:#34d399; --accent-2:#10b981; --accent-ink:#a7f3d0; --accent-soft:rgba(16,185,129,.14);
+      --dot:#3a3b41; --grid:rgba(255,255,255,.04);
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 20px 44px -26px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0b0c0e; --panel:#161719; --sunk:#101113;
+    --ink:#ececee; --muted:#9d9da4; --faint:#66666e;
+    --line:#26272b; --line2:#33343a;
+    --accent:#34d399; --accent-2:#10b981; --accent-ink:#a7f3d0; --accent-soft:rgba(16,185,129,.14);
+    --dot:#3a3b41; --grid:rgba(255,255,255,.04);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 20px 44px -26px rgba(0,0,0,.8);
+  }
+
+  *{box-sizing:border-box}
+  :root{
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --cjk:"PingFang TC","Noto Sans TC","Microsoft JhengHei",-apple-system,"Segoe UI",system-ui,sans-serif;
+  }
+  html{color-scheme:light dark}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--cjk);line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:44px 44px;}
+  .wrap{max-width:760px;margin:0 auto;padding:30px 22px 34px}
+
+  /* 標題（左對齊，反置中偏見） */
+  .kicker{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 9px;display:flex;align-items:center;gap:9px}
+  .kicker::before{content:"";width:22px;height:1px;background:var(--accent)}
+  h1{font-family:var(--cjk);font-weight:800;font-size:clamp(25px,4.6vw,38px);line-height:1.1;
+    letter-spacing:-.01em;margin:0 0 9px}
+  h1 b{color:var(--accent);font-weight:800}
+  .lede{color:var(--muted);font-size:14.5px;max-width:52ch;margin:0 0 18px}
+
+  /* 三階段圖例（動作為主，序號為輔） */
+  .legend{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 16px}
+  @media(max-width:600px){.legend{grid-template-columns:1fr;gap:7px}}
+  .leg{padding:10px 13px;border:1px solid var(--line);border-radius:12px;background:var(--panel);
+    opacity:.45;transition:opacity .4s,border-color .4s,box-shadow .4s}
+  .leg.on{opacity:1;border-color:var(--accent);box-shadow:var(--shadow)}
+  .leg .n{font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--faint);letter-spacing:.05em}
+  .leg.on .n{color:var(--accent)}
+  .leg b{display:block;font-size:14px;margin:2px 0 0}
+  .leg span{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+
+  /* 舞台 */
+  .stage{position:relative;height:var(--h,284px);border:1px solid var(--line);border-radius:18px;
+    background:var(--panel);box-shadow:var(--shadow);overflow:hidden}
+  .stage::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 0%,var(--sunk),transparent 70%);pointer-events:none}
+  @media(max-width:600px){.stage{--h:270px}}
+
+  .link{position:absolute;left:33%;top:50%;width:34%;height:2px;transform:translateY(-50%);
+    background:repeating-linear-gradient(90deg,var(--line2) 0 6px,transparent 6px 13px);transition:opacity .4s}
+  .link.dim{opacity:.3}
+  .cut{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);width:24px;height:24px;
+    border-radius:50%;background:var(--panel);border:1.5px solid var(--faint);color:var(--faint);
+    display:grid;place-items:center;transition:transform .3s}
+  .cut svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round}
+  .link.severed .cut{transform:translate(-50%,-50%) scale(1)}
+
+  .node{position:absolute;transform:translate(-50%,-50%);text-align:center;transition:opacity .4s}
+  .node .cap{font-size:12.5px;margin-top:10px;color:var(--muted);font-weight:600}
+  .node .cap small{display:block;font-weight:400;color:var(--faint);font-size:10.5px;font-family:var(--mono);margin-top:2px}
+
+  /* 瀏覽器 */
+  .browser{left:24%;top:50%;width:188px}
+  .frame{border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--sunk);transition:border-color .4s,box-shadow .4s}
+  .browser.hot .frame{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+  .chrome{display:flex;gap:5px;padding:8px 11px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .chrome i{width:8px;height:8px;border-radius:50%;background:var(--line2)}
+  .screen{position:relative;height:80px;padding:12px}
+  .st{position:absolute;inset:12px;opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s;pointer-events:none}
+  .st.on{opacity:1;transform:none}
+  .field{border:1px solid var(--line2);border-radius:8px;padding:7px 9px;font-size:11px;
+    display:flex;align-items:center;gap:7px;background:var(--panel);color:var(--faint);font-family:var(--mono)}
+  .field.live{color:var(--ink);border-color:var(--accent)}
+  .field svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;flex:none}
+  .spin{width:12px;height:12px;border-radius:50%;border:2px solid var(--line2);border-top-color:var(--accent);
+    animation:spin .7s linear infinite;flex:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .rows{margin-top:6px;display:flex;flex-direction:column;gap:3px}
+  .rows .r{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--panel);
+    border:1px solid var(--line);border-radius:6px;padding:3px 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rows .r b{color:var(--accent)}
+  .caret{display:inline-block;width:6px;height:12px;background:var(--accent);animation:blink 1.1s steps(2) infinite;vertical-align:-2px;margin-left:1px}
+  @keyframes blink{50%{opacity:0}}
+
+  /* 伺服器 */
+  .server{left:79%;top:50%;width:130px}
+  .rack{border:1px solid var(--line2);border-radius:12px;background:var(--sunk);padding:14px 12px 12px;transition:border-color .4s,box-shadow .4s}
+  .server.hot .rack{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+  .rack .u{height:12px;border:1px solid var(--line2);border-radius:4px;margin-bottom:5px;position:relative;background:var(--panel)}
+  .rack .u::after{content:"";position:absolute;left:6px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:var(--line2)}
+  .server.hot .rack .u::after{background:var(--accent)}
+  .badge{margin-top:9px;text-align:center}
+  .badge span{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.03em;color:var(--muted);
+    border:1px solid var(--line2);border-radius:20px;padding:2px 9px;display:inline-block;transition:.4s}
+  .server.hot .badge span{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-soft)}
+
+  /* 封包（transform 位移，效能友善） */
+  .pkt{position:absolute;left:0;top:0;transform:translate(-50%,-50%);font-family:var(--mono);font-size:11px;font-weight:700;
+    white-space:nowrap;padding:4px 11px;border-radius:20px;opacity:0;pointer-events:none;z-index:5}
+  .pkt.req{background:var(--panel);color:var(--muted);border:1px solid var(--line2)}
+  .pkt.res{background:var(--accent-soft);color:var(--accent-ink);border:1px solid var(--accent);
+    box-shadow:0 8px 22px -10px var(--accent)}
+  .pkt.big{font-size:12px;padding:6px 13px}
+  .pkt.run{animation:fly var(--dur,1.2s) cubic-bezier(.4,0,.15,1) forwards}
+  @keyframes fly{
+    0%{opacity:0;transform:translate(-50%,-50%) translate(0,0) scale(.9)}
+    16%{opacity:1;transform:translate(-50%,-50%) translate(0,0) scale(1)}
+    88%{opacity:1}
+    100%{opacity:1;transform:translate(-50%,-50%) translate(var(--dx,0),var(--dy,0)) scale(1)}
+  }
+
+  /* 說明 + 控制 */
+  .cap-line{min-height:46px;margin:15px 2px 4px;font-size:14px;color:var(--ink)}
+  .cap-line .k{font-family:var(--mono);font-size:12.5px;color:var(--accent-ink);background:var(--accent-soft);
+    padding:1px 7px;border-radius:6px;font-weight:700}
+  .cap-line b{color:var(--accent);font-weight:700}
+  .controls{display:flex;align-items:center;gap:16px;margin-top:12px}
+  .nav{width:40px;height:40px;border-radius:11px;border:1px solid var(--line2);background:var(--panel);color:var(--ink);
+    display:grid;place-items:center;cursor:pointer;transition:.18s;flex:none}
+  .nav:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+  .nav:active{transform:translateY(0)}
+  .nav svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .dots{display:flex;gap:8px;flex:1;justify-content:center}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--dot);border:none;cursor:pointer;padding:0;transition:.25s}
+  .dot.on{background:var(--accent);width:24px;border-radius:4px}
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:11px}
+  .toggle{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--muted);background:none;border:none;
+    cursor:pointer;display:flex;align-items:center;gap:7px;padding:6px 2px}
+  .toggle:hover{color:var(--accent)}
+  .toggle svg{width:13px;height:13px;fill:currentColor}
+  .count{font-family:var(--mono);font-size:12px;color:var(--faint)}
+
+  .theme{position:fixed;top:16px;right:16px;font-family:var(--mono);font-size:11.5px;font-weight:700;
+    border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:10px;padding:7px 12px;cursor:pointer;box-shadow:var(--shadow)}
+  .theme:hover{color:var(--accent);border-color:var(--accent)}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+  @media (prefers-reduced-motion:reduce){
+    .pkt.run{animation:none;opacity:1;transform:translate(-50%,-50%) translate(var(--dx,0),var(--dy,0))}
+    .spin{animation:none;border-top-color:var(--line2)}
+    .caret{animation:none}
+  }
+</style>
+</head>
+<body>
+<button class="theme" id="themeBtn" type="button">主題</button>
+<div class="wrap">
+  <p class="kicker">Domino 機關代碼下拉 · 前端全量架構</p>
+  <h1>四萬筆下拉，<b>三階段</b>載入</h1>
+  <p class="lede">為什麼一次載全量還能不卡、不白畫面？把載入拆成三步看：先出畫面、背景抓全量、灌入即可本地搜尋。</p>
+
+  <div class="legend">
+    <div class="leg" data-stage="0"><span class="n">STAGE 01</span><b>先出畫面</b><span>HTML 空殼先 render</span></div>
+    <div class="leg" data-stage="1"><span class="n">STAGE 02</span><b>背景抓全量</b><span>fetch mode=all · 快取</span></div>
+    <div class="leg" data-stage="2"><span class="n">STAGE 03</span><b>灌入可搜</b><span>虛擬化 + 本地過濾</span></div>
+  </div>
+
+  <div class="stage" id="stage" aria-live="polite">
+    <div class="link" id="link"><span class="cut"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span></div>
+
+    <!-- 瀏覽器 -->
+    <div class="node browser" id="browser" data-active="0-5">
+      <div class="frame">
+        <div class="chrome"><i></i><i></i><i></i></div>
+        <div class="screen">
+          <div class="st" data-show="0"><div class="field"><span class="spin"></span>請求頁面</div></div>
+          <div class="st" data-show="1-3"><div class="field"><span class="spin"></span>資料載入中</div></div>
+          <div class="st" data-show="4">
+            <div class="field live"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>輸入名稱或代碼</div>
+            <div class="rows"><div class="r">39,257 筆已載入 · 渲染上限 50</div></div>
+          </div>
+          <div class="st" data-show="5">
+            <div class="field live"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>108<span class="caret"></span></div>
+            <div class="rows">
+              <div class="r"><b>108</b>學年度宜蘭區高中免試</div>
+              <div class="r">A0955<b>108</b>UU · 高捷施工處</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="cap">你的瀏覽器<small>Tom Select</small></p>
+    </div>
+
+    <!-- 伺服器 -->
+    <div class="node server" id="server" data-active="0-3">
+      <div class="rack"><div class="u"></div><div class="u"></div><div class="u"></div>
+        <div class="badge"><span>applicationScope 快取</span></div>
+      </div>
+      <p class="cap">Domino 伺服器<small>xspServiceLookup.xsp</small></p>
+    </div>
+
+    <!-- 封包 -->
+    <div class="pkt req" data-step="0" data-fx="30" data-fy="50" data-tx="72" data-ty="50">GET / · HTML</div>
+    <div class="pkt res" data-step="1" data-fx="72" data-fy="50" data-tx="30" data-ty="50">HTML · CSS · JS</div>
+    <div class="pkt req" data-step="2" data-fx="30" data-fy="50" data-tx="72" data-ty="50">GET ?mode=all</div>
+    <div class="pkt res big" data-step="3" data-fx="72" data-fy="50" data-tx="30" data-ty="50">39,257 筆 · 1.7MB</div>
+  </div>
+
+  <p class="cap-line" id="caption"></p>
+
+  <div class="controls">
+    <button class="nav" id="prev" type="button" aria-label="上一步"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg></button>
+    <div class="dots" id="dots"></div>
+    <button class="nav" id="next" type="button" aria-label="下一步"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>
+  </div>
+  <div class="foot">
+    <button class="toggle" id="play" type="button"><svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span id="playTxt">自動播放</span></button>
+    <span class="count" id="count"></span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const N=6, STAGE_OF=[0,0,1,1,2,2];
+  const CAP=[
+    '使用者開啟頁面，瀏覽器向 Domino 要 <span class="k">HTML</span>。',
+    '<span class="k">defer</span> 讓 JS 不擋 render；HTML 一到，畫面框架與下拉空殼<b>立刻出現</b>（顯示「資料載入中」）。不再白畫面。',
+    '畫面已可見。前端在背景發出 <span class="k">fetch ?mode=all</span>，向 Domino 要全部資料。',
+    'Domino 從 <span class="k">applicationScope 快取</span>回傳全量：39,257 筆、1.7MB，約 0.4 秒（冷啟動才 8 秒）。',
+    '4 萬筆灌進 Tom Select。<span class="k">虛擬化</span>下任何時刻最多只渲染 50 筆，init 約 50ms。',
+    '打「108」後，名稱、代碼、中間關鍵字全<b>純前端過濾</b>，瞬間出結果，<b>不再打伺服器</b>。'
+  ];
+  const q=s=>document.querySelector(s), qa=s=>document.querySelectorAll(s);
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const stage=q('#stage');
+  let step=0, timer=null;
+
+  function match(spec,s){
+    return String(spec).split(',').some(p=>{
+      if(p.includes('-')){const[a,b]=p.split('-').map(Number);return s>=a&&s<=b;}
+      return Number(p)===s;
+    });
+  }
+
+  const dotsEl=q('#dots');
+  for(let i=0;i<N;i++){
+    const b=document.createElement('button');
+    b.className='dot'; b.type='button'; b.setAttribute('aria-label','步驟 '+(i+1));
+    b.onclick=()=>{stop();go(i);};
+    dotsEl.appendChild(b);
+  }
+  const dots=qa('.dot');
+
+  function fly(el){
+    const r=stage.getBoundingClientRect();
+    const fx=+el.dataset.fx, fy=+el.dataset.fy, tx=+el.dataset.tx, ty=+el.dataset.ty;
+    el.style.left=fx+'%'; el.style.top=fy+'%';
+    el.style.setProperty('--dx',((tx-fx)/100*r.width).toFixed(1)+'px');
+    el.style.setProperty('--dy',((ty-fy)/100*r.height).toFixed(1)+'px');
+    el.classList.remove('run'); void el.offsetWidth; el.classList.add('run');
+  }
+
+  function render(){
+    qa('[data-active]').forEach(el=> el.style.opacity=match(el.dataset.active,step)?'1':'.3');
+    q('#server').classList.toggle('hot', match('0-3',step));   // 伺服器通訊中（步驟 0-3）亮起
+    q('#browser').classList.toggle('hot', step>=4);            // 資料到手後瀏覽器亮起
+    qa('.st').forEach(el=> el.classList.toggle('on', match(el.dataset.show,step)));
+    q('#link').classList.toggle('severed', step===5);
+    q('#link').classList.toggle('dim', step>=4);
+    qa('.pkt').forEach(el=>{ if(+el.dataset.step===step) fly(el); else el.classList.remove('run'); });
+    qa('.leg').forEach(el=> el.classList.toggle('on', +el.dataset.stage===STAGE_OF[step]));
+    q('#caption').innerHTML=CAP[step];
+    dots.forEach((d,i)=>d.classList.toggle('on',i===step));
+    q('#count').textContent='步驟 '+(step+1)+' / '+N+' · STAGE 0'+(STAGE_OF[step]+1);
+  }
+  function go(i){ step=(i+N)%N; render(); }
+
+  q('#next').onclick=()=>{stop();go(step+1);};
+  q('#prev').onclick=()=>{stop();go(step-1);};
+
+  const playIcon=q('#playIcon'), playTxt=q('#playTxt');
+  function play(){
+    timer=setInterval(()=>{ step>=N-1?go(0):go(step+1); },2200);
+    playIcon.innerHTML='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>'; playTxt.textContent='暫停';
+  }
+  function stop(){ if(timer){clearInterval(timer);timer=null;
+    playIcon.innerHTML='<path d="M8 5v14l11-7z"/>'; playTxt.textContent='自動播放';} }
+  q('#play').onclick=()=> timer?stop():play();
+
+  q('#themeBtn').onclick=()=>{
+    const r=document.documentElement;
+    const cur=r.getAttribute('data-theme');
+    const sysDark=matchMedia('(prefers-color-scheme:dark)').matches;
+    const now=(cur==='auto'||!cur)?(sysDark?'dark':'light'):cur;
+    r.setAttribute('data-theme', now==='dark'?'light':'dark');
+  };
+
+  render();
+  if(!reduce) setTimeout(play,1000);   // 尊重 prefers-reduced-motion：不自動播、不飛
+})();
+</script>
+</body>
+</html>

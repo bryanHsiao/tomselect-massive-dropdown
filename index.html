@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>四萬筆下拉選單 · 前端全量效能實驗</title>
+<meta name="description" content="機關代碼表 4 萬筆下拉選單的前端搜尋效能實驗：Tom Select 虛擬化 + 全量載入 + 三階段載入解析。">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root[data-theme="light"], :root:not([data-theme="dark"]){
+    --bg:#f7f7f8;--panel:#fff;--sunk:#fbfbfc;--ink:#18181b;--muted:#52525b;--faint:#a1a1aa;
+    --line:#e6e6e9;--line2:#d6d6da;--accent:#047857;--accent-soft:#e2f5ec;--grid:rgba(24,24,27,.045);
+    --shadow:0 1px 2px rgba(20,25,30,.05),0 14px 34px -22px rgba(20,25,30,.4);
+  }
+  @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#0b0c0e;--panel:#161719;--sunk:#101113;--ink:#ececee;--muted:#9d9da4;--faint:#66666e;
+    --line:#26272b;--line2:#33343a;--accent:#34d399;--accent-soft:rgba(16,185,129,.14);--grid:rgba(255,255,255,.04);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 20px 44px -26px rgba(0,0,0,.8);
+  }}
+  :root[data-theme="dark"]{
+    --bg:#0b0c0e;--panel:#161719;--sunk:#101113;--ink:#ececee;--muted:#9d9da4;--faint:#66666e;
+    --line:#26272b;--line2:#33343a;--accent:#34d399;--accent-soft:rgba(16,185,129,.14);--grid:rgba(255,255,255,.04);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 20px 44px -26px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  html{color-scheme:light dark}
+  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.62;-webkit-font-smoothing:antialiased;
+    font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",-apple-system,"Segoe UI",system-ui,sans-serif;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:44px 44px;}
+  .wrap{max-width:720px;margin:0 auto;padding:56px 22px 72px}
+  .mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+  .kicker{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 12px;display:flex;align-items:center;gap:9px}
+  .kicker::before{content:"";width:22px;height:1px;background:var(--accent)}
+  h1{font-weight:800;font-size:clamp(28px,5vw,44px);line-height:1.1;letter-spacing:-.01em;margin:0 0 14px}
+  h1 b{color:var(--accent)}
+  .lede{color:var(--muted);font-size:15.5px;max-width:56ch;margin:0 0 32px}
+
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:34px}
+  @media(max-width:560px){.cards{grid-template-columns:1fr}}
+  a.card{display:block;padding:20px;border:1px solid var(--line);border-radius:15px;background:var(--panel);
+    text-decoration:none;color:inherit;box-shadow:var(--shadow);transition:transform .18s,border-color .18s}
+  a.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+  a.card .tag{font-family:"JetBrains Mono",monospace;font-size:10.5px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--accent)}
+  a.card h3{font-size:17px;margin:8px 0 6px}
+  a.card p{font-size:13px;color:var(--muted);margin:0}
+  a.card .go{margin-top:12px;font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--accent)}
+
+  h2{font-size:14px;margin:0 0 12px;color:var(--faint);font-family:"JetBrains Mono",monospace;
+    letter-spacing:.05em;text-transform:uppercase;font-weight:700}
+  table{border-collapse:collapse;width:100%;font-size:13px;margin-bottom:34px}
+  th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
+  th{background:var(--panel);color:var(--muted);font-weight:600}
+  td.mono{font-family:"JetBrains Mono",monospace}
+  .ok{color:var(--accent);font-weight:700}
+  .bad{color:var(--faint)}
+  footer{color:var(--faint);font-size:12.5px;border-top:1px solid var(--line);padding-top:20px}
+  footer a{color:var(--muted)}
+  .theme{position:fixed;top:16px;right:16px;font-family:"JetBrains Mono",monospace;font-size:11.5px;font-weight:700;
+    border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:10px;padding:7px 12px;cursor:pointer}
+  .theme:hover{color:var(--accent);border-color:var(--accent)}
+</style>
+</head>
+<body>
+<button class="theme" id="themeBtn" type="button">主題</button>
+<div class="wrap">
+  <p class="kicker">Front-end Performance Experiment</p>
+  <h1>四萬筆下拉選單，<b>怎麼搜才不卡</b></h1>
+  <p class="lede">機關代碼表約 4 萬筆，要讓使用者打字即搜（名稱、代碼、中間關鍵字都要中）。這是一組實測：把全量塞進 DOM 會凍結瀏覽器，唯二可行解是伺服器端搜尋、或前端虛擬化。</p>
+
+  <div class="cards">
+    <a class="card" href="./loading-stages-demo.html">
+      <div class="tag">動畫解說</div>
+      <h3>三階段載入</h3>
+      <p>先出畫面 → 背景抓全量 → 灌入可搜。逐步動畫拆解為什麼全量載入還能不卡不白畫面。</p>
+      <div class="go">開啟動畫 →</div>
+    </a>
+    <a class="card" href="./tomselect-demo.html">
+      <div class="tag">互動 Demo</div>
+      <h3>四萬筆即時搜尋</h3>
+      <p>前端生成 4 萬筆，全量灌 Tom Select。實際打字感受虛擬化搜尋（可多選）。</p>
+      <div class="go">開啟 Demo →</div>
+    </a>
+  </div>
+
+  <h2>實測數據 · 60,000 筆 · Chrome</h2>
+  <table>
+    <tr><th>方案</th><th>初始化</th><th>搜尋反應</th><th>判定</th></tr>
+    <tr><td>select2 灌 data 全量</td><td class="mono">2,090 ms</td><td class="mono">563 ms</td><td class="bad">凍結約 2 秒</td></tr>
+    <tr><td>Choices.js 全量</td><td class="mono">32,001 ms</td><td class="mono">60,067 ms</td><td class="bad">瀏覽器無回應</td></tr>
+    <tr><td>select2 ajax（server search）</td><td class="mono">44 ms</td><td class="mono">133 ms</td><td class="ok">流暢</td></tr>
+    <tr><td>Tom Select（虛擬化 · 全量）</td><td class="mono">51 ms</td><td class="mono">134 ms</td><td class="ok">流暢</td></tr>
+  </table>
+
+  <footer>
+    合成資料的效能實驗；正式環境資料由 Domino XAgent 全量端點供應（伺服器端 applicationScope 快取）。
+    元件：<span class="mono">Tom Select 2.3</span>。
+  </footer>
+</div>
+<script>
+document.getElementById('themeBtn').onclick=()=>{
+  const r=document.documentElement, cur=r.getAttribute('data-theme');
+  const sysDark=matchMedia('(prefers-color-scheme:dark)').matches;
+  const now=(cur==='auto'||!cur)?(sysDark?'dark':'light'):cur;
+  r.setAttribute('data-theme', now==='dark'?'light':'dark');
+};
+</script>
+</body>
+</html>
